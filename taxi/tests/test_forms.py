@@ -19,21 +19,27 @@ class FormsTests(TestCase):
         }
         form = DriverCreationForm(data=form_data)
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data, form_data)
+        self.assertEqual(form.cleaned_data["username"], form_data["username"])
+        self.assertEqual(form.cleaned_data["first_name"], form_data["first_name"])
+        self.assertEqual(form.cleaned_data["last_name"], form_data["last_name"])
+        self.assertEqual(form.cleaned_data["license_number"], form_data["license_number"])
+        user = form.save()
+        self.assertTrue(user.check_password(form_data["password1"]))
+        self.assertEqual(user.license_number, form_data["license_number"])
 
 
 class SearchFormsTests(TestCase):
     def test_driver_empty_query_is_valid(self):
-        form = DriverSearchForm({"query": ""})
+        form = DriverSearchForm({"username": ""})
         self.assertTrue(form.is_valid())
         self.assertIn("username", form.cleaned_data)
 
     def test_car_empty_query_is_valid(self):
-        form = CarSearchForm({"query": ""})
+        form = CarSearchForm({"model": ""})
         self.assertTrue(form.is_valid())
         self.assertIn("model", form.cleaned_data)
 
     def test_manufacturer_empty_query_is_valid(self):
-        form = ManufacturerSearchForm({"query": ""})
+        form = ManufacturerSearchForm({"name": ""})
         self.assertTrue(form.is_valid())
         self.assertIn("name", form.cleaned_data)
